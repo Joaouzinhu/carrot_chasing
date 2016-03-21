@@ -3,7 +3,7 @@
 #include <geometry_msgs/Twist.h>
 #include <tf/tf.h>
 #include <geometry_msgs/Point.h>
-#include<cmath>
+#include <cmath>
 
 geometry_msgs::Point robo;
 geometry_msgs::Point ponto_inicial;
@@ -14,7 +14,7 @@ geometry_msgs::Quaternion qt;
 
 ros::Publisher pub_vel;
 
-double delta = 0.5, ang_yaw, theta, var_psi, distance_R,distance_RU,beta, theta_U,psi;
+double delta = 0.5, ang_yaw, theta, var_psi, distance_R,distance_RU,beta, theta_U,psi,k_PA;
 void odom_callback(const nav_msgs::OdometryConstPtr &odom_msg)
 {
     ponto_inicial.x = 4;
@@ -42,9 +42,14 @@ void odom_callback(const nav_msgs::OdometryConstPtr &odom_msg)
     {
         var_psi = var_psi + 360;
     }
-    vel_robo.linear.x = 0.3;
-    vel_robo.angular.z = 0.01*var_psi;
+    vel_robo.linear.x = 1;
+    vel_robo.angular.z = 0.05*var_psi;
+    if(std::abs(vel_robo.angular.z)>10)
+    {
+        vel_robo.angular.z = 10*(var_psi/std::abs(var_psi));
+    }    
     pub_vel.publish(vel_robo);
+    ROS_INFO("Velocidade : %f",vel_robo.angular.z);
         
 }
 
